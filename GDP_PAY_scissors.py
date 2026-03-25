@@ -72,6 +72,6 @@ plt.tight_layout()
 
 plt.savefig('japonsko_nuzky_mzdy_profi.png', dpi=400, bbox_inches='tight')
 plt.savefig('japonsko_nuzky_mzdy_profi.svg', format='svg', bbox_inches='tight')
-print("Graf 'rozevírajících se nůžek' s milníky úspěšně uložen!")
+print("saved")
 
 plt.show()

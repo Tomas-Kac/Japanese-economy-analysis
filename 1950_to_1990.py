@@ -63,7 +63,7 @@ try:
     plt.tight_layout()
     
     plt.savefig('japonsko_hdp_profi.png', dpi=400, bbox_inches='tight')
-    print("Profesionální graf úspěšně uložen jako 'japonsko_hdp_profi.png'")
+    print("saved as'japonsko_hdp_profi.png'")
     
     plt.show()
 

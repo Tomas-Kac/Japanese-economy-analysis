@@ -3,37 +3,30 @@ import pandas_datareader.data as web
 import matplotlib.pyplot as plt
 import datetime
 
-# Globální nastavení pro kvalitní export
 plt.rcParams['savefig.dpi'] = 400
 
-# Nastavení časového období (od 1990 po nejnovější dostupná data)
 start = datetime.datetime(1990, 1, 1)
 end = datetime.datetime(2023, 12, 31)
 
 try:
-    print("Stahuji data o státním dluhu přes FRED API...")
-    # Ticker GGGDTAJPA188N: General government gross debt for Japan (v % HDP)
+    print("downloading from FRED API...")
+
     df_dluh = web.DataReader('GGGDTAJPA188N', 'fred', start, end)
     df_dluh.columns = ['Dluh_HDP']
     df_dluh = df_dluh.dropna()
 
-    # Získání hodnot pro záchytné body (pomocí data indexu)
     val_1991 = df_dluh[df_dluh.index.year == 1991]['Dluh_HDP'].values[0]
     val_2012 = df_dluh[df_dluh.index.year == 2012]['Dluh_HDP'].values[0]
     val_last = df_dluh['Dluh_HDP'].values[-1]
     last_year = df_dluh.index[-1].year
 
-    # ================== VIZUÁLNÍ STYLING ==================
     fig, ax = plt.subplots(figsize=(12, 7), facecolor='#f8f9fa')
     ax.set_facecolor('#f8f9fa')
 
-    # Vykreslení křivky dluhu
     ax.plot(df_dluh.index, df_dluh['Dluh_HDP'], color='#b71c1c', linewidth=4, label='Státní dluh', zorder=3)
 
-    # Vyplnění prostoru pod křivkou pro dramatický efekt
     ax.fill_between(df_dluh.index, 0, df_dluh['Dluh_HDP'], color='#e63946', alpha=0.15)
 
-    # Časové milníky (Prasknutí bubliny a Abenomika)
     dt_1991 = datetime.datetime(1991, 1, 1)
     dt_2012 = datetime.datetime(2012, 1, 1)
     dt_last = df_dluh.index[-1]
@@ -46,30 +39,25 @@ try:
 
     ax.scatter([dt_last], [val_last], color='#b71c1c', s=80, zorder=5)
     
-    # Textík s aktuální výší dluhu u konce křivky
     ax.text(dt_last + datetime.timedelta(days=150), val_last, f'Dluh\n({val_last:.0f} %)', 
             color='#b71c1c', fontweight='bold', va='center')
 
-    # Box 1991
     bbox_1991_zeleny = dict(boxstyle="round,pad=0.5", fc="#e8f5e9", ec="#2ca02c", lw=1.5, alpha=0.95)
 
     ax.annotate('Konec zázraku', 
                 xy=(dt_1991, val_1991), xytext=(datetime.datetime(1991, 6, 1), 110),
-                # Šipku nechávám tmavě šedou (#343a40) pro dobrou viditelnost, 
-                # ale můžeš ji změnit taky na ec="#2ca02c", pokud chceš mít i šipku zelenou.
+
                 arrowprops=dict(facecolor='#343a40', shrink=0.05, width=1.5, headwidth=8),
                 fontsize=10, fontweight='bold', 
-                color='#1b5e20', # Tmavě zelená barva samotného textu
+                color='#1b5e20',
                 bbox=bbox_1991_zeleny, zorder=10)
 
-    # Box 2012
     bbox_2012 = dict(boxstyle="round,pad=0.5", fc="#fff8e1", ec="#ff9f1c", lw=1.5, alpha=0.95)
     ax.annotate('2012: Nástup Abenomiky\nBOJ začíná masivně nakupovat dluh', 
                 xy=(dt_2012, val_2012), xytext=(datetime.datetime(1999, 1, 1), 250),
                 arrowprops=dict(facecolor='#343a40', shrink=0.05, width=1.5, headwidth=8),
                 fontsize=10, fontweight='bold', color='#e65100', bbox=bbox_2012, zorder=10)
 
-    # Čištění designu
     ax.grid(axis='y', color='white', linestyle='-', linewidth=2)
     ax.grid(axis='x', color='white', linestyle='-', linewidth=2)
     ax.spines['top'].set_visible(False)
@@ -77,11 +65,9 @@ try:
     ax.spines['left'].set_visible(False)
     ax.spines['bottom'].set_color('#adb5bd')
 
-    # Omezení os
     ax.set_xlim(datetime.datetime(1989, 1, 1), dt_last + datetime.timedelta(days=1200))
     ax.set_ylim(0, max(df_dluh['Dluh_HDP']) * 1.1)
 
-    # Úprava popisků osy Y (přidání symbolu %)
     yticks = ax.get_yticks()
     ax.set_yticklabels([f'{int(tick)} %' for tick in yticks], color='#495057', fontweight='bold')
 
@@ -94,7 +80,7 @@ try:
     plt.savefig('japonsko_dluh_hdp_api_profi.png', dpi=400, bbox_inches='tight')
     plt.savefig('japonsko_dluh_hdp_api_profi.svg', format='svg', bbox_inches='tight')
     
-    print("Úspěšně staženo a vygenerováno! Profesionální graf uložen jako 'japonsko_dluh_hdp_api_profi.png'")
+    print("saved as 'japonsko_dluh_hdp_api_profi.png'")
 
 except Exception as e:
-    print(f"Něco se pokazilo s připojením k FRED: {e}")
+    print(f"error: {e}")
